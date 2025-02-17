@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="layout :: head">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<div th:replace="layout :: nav"></div>
+
+<div class="container mt-4">
+  <!-- Título con icono -->
+  <h2 class="text-center mb-4">
+    <i class="bi bi-table text-primary me-2"></i>
+    Registros Meteorológicos
+  </h2>
+
+  <!-- Formulario de búsqueda -->
+  <div class="card shadow mb-4">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">
+        <i class="bi bi-search"></i> Búsqueda y Filtros
+      </h5>
+    </div>
+    <div class="card-body">
+      <form th:action="@{/list}" method="get" class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="bi bi-geo-alt"></i> Ciudad
+          </label>
+          <input type="text" class="form-control" name="city" th:value="${city}"/>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="bi bi-thermometer-low"></i> Temperatura Mínima
+          </label>
+          <input type="number" step="0.1" class="form-control" name="minTemp" th:value="${minTemp}"/>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">
+            <i class="bi bi-thermometer-high"></i> Temperatura Máxima
+          </label>
+          <input type="number" step="0.1" class="form-control" name="maxTemp" th:value="${maxTemp}"/>
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary me-2">
+            <i class="bi bi-search"></i> Buscar
+          </button>
+          <a th:href="@{/list}" class="btn btn-outline-secondary">
+            <i class="bi bi-x-circle"></i> Limpiar
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Mensaje cuando no hay resultados -->
+  <div th:if="${weatherList.empty}" class="alert alert-info">
+    <i class="bi bi-info-circle me-2"></i>
+    <span th:if="${city != null && !city.empty}">
+                No se encontraron registros para la ciudad: "<strong th:text="${city}"></strong>"
+            </span>
+    <span th:if="${minTemp != null || maxTemp != null}">
+                en el rango de temperatura
+                <strong th:if="${minTemp != null}" th:text="${minTemp + '°C'}"></strong>
+                <strong th:if="${minTemp != null && maxTemp != null}"> - </strong>
+                <strong th:if="${maxTemp != null}" th:text="${maxTemp + '°C'}"></strong>
+            </span>
+    <span th:if="${city == null && minTemp == null && maxTemp == null}">
+                No hay registros meteorológicos disponibles.
+            </span>
+  </div>
+
+  <!-- Tabla de resultados -->
+  <div th:if="${!weatherList.empty}" class="card shadow">
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead class="table-light">
+        <tr>
+          <th><i class="bi bi-geo-alt"></i> Ciudad</th>
+          <th><i class="bi bi-thermometer-half"></i> Temperatura</th>
+          <th><i class="bi bi-droplet-half"></i> Humedad</th>
+          <th><i class="bi bi-gear"></i> Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="weather : ${weatherList}">
+          <td th:text="${weather.city}"></td>
+          <td>
+            <span th:text="${weather.temperature}"></span>°C
+          </td>
+          <td>
+            <span th:text="${weather.humidity}"></span>%
+          </td>
+          <td>
+            <a th:href="@{/edit/{id}(id=${weather.id})}"
+               class="btn btn-warning btn-sm me-1">
+              <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a th:href="@{/delete/{id}(id=${weather.id})}"
+               class="btn btn-danger btn-sm"
+               onclick="return confirm('¿Estás seguro de que quieres eliminar este registro?')">
+              <i class="bi bi-trash"></i> Eliminar
+            </a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Botón para nuevo registro -->
+  <div class="mt-4 text-center">
+    <a th:href="@{/}" class="btn btn-primary btn-lg">
+      <i class="bi bi-plus-circle"></i> Nuevo Registro
+    </a>
+  </div>
+</div>
+
+<div th:replace="layout :: footer"></div>
+</body>
+</html>
