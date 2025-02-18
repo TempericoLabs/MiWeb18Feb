@@ -9,7 +9,8 @@ RUN mvn clean package -DskipTests
 # Run stage
 FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY --from=builder /app/target/MiWeb-0.0.1-SNAPSHOT.jar.original ./app.jar
+# Aquí está el cambio: quitamos el .original
+COPY --from=builder /app/target/MiWeb-0.0.1-SNAPSHOT.jar ./app.jar
 RUN ls -la
-# El cambio importante está aquí - El comando de ejecución debe usar app.jar
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
